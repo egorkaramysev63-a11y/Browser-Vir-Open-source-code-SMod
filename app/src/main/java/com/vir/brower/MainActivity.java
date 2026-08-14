@@ -1031,7 +1031,7 @@ public class MainActivity extends Activity {
 						showModSetupManager();
 					}
 					else if (selectedItem.equals(t("🔍 Поисковая система", "🔍 Search Engine"))) {
-						showSearchEngineDialog(); // Открывает окно выбора Google/Яндекс/DuckDuckGo/Trashbox
+						showSearchEngineDialog();
 					}
 					else if (selectedItem.equals(t("Изменить пароль/защиту", "Change Password")) || 
 							 selectedItem.equals(t("Включить защиту (Создать пароль)", "Enable Security"))) {
@@ -1211,9 +1211,9 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					notesList.remove(index);
-					saveNotes(notesList); // Сохраняем изменения
+					saveNotes(notesList);
 					Toast.makeText(MainActivity.this, t("Заметка удалена", "Note deleted"), Toast.LENGTH_SHORT).show();
-					showNotes(); // Возврат к списку
+					showNotes();
 				}
 			})
 			.setNegativeButton(t("Назад", "Back"), new DialogInterface.OnClickListener() {
