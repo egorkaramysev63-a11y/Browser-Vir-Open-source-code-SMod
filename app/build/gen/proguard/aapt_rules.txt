@@ -1,0 +1,9 @@
+# view AndroidManifest.xml #generated:66
+-keep class com.vir.brower.ChatActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:70
+-keep class com.vir.brower.LoginActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:47
+-keep class com.vir.brower.MainActivity { <init>(...); }
+
