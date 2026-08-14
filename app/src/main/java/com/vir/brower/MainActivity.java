@@ -83,11 +83,9 @@ public class MainActivity extends Activity {
     private int currentTabIndex = -1;
 	private boolean isModNoAdsInstalled = false;
 	private final String MOD_PATH = "mod/noads/";
-	private boolean isAntiSpyEnabled = false; // Защита от скриншотов
-	private boolean isTextOnlyMode = false;   // Режим "Только текст"
-	// ДОБАВЬТЕ В САМЫЙ ВЕРХ КЛАССА MAINACTIVITY:
-	private final StringBuilder vpnLogBuilder = new StringBuilder();
-	
+	private boolean isAntiSpyEnabled = false;
+	private boolean isTextOnlyMode = false;
+	private final StringBuilder vpnLogBuilder = new StringBuilder();	
     private final String VERSION = "1.4.3-power-x";
     private final String SERIES = "Power X";
     private final String Text = "    Hello :-)";
@@ -95,27 +93,20 @@ public class MainActivity extends Activity {
     private final String verandroid = "Android 8.0 Oreo API 26";
     private final String TextWel = "                         Welcome Vir";
     private String lang = "RU";
-	// ДОБАВЬТЕ ЭТО В САМЫЙ ВЕРХ КЛАССА MAINACTIVITY:
-	private boolean isVpnActive = false;         // Активирован ли туннель сейчас
-	private String selectedVpnRegion = "";       // Название выбранного региона
-	private String customProxyServer = "";       // Личный IP-адрес прокси пользователя
-	private int selectedSearchEngine = 0; // 0: Google, 1: Яндекс, 2: DuckDuckGo, 3: Trashbox
-	
-
+	private boolean isVpnActive = false;    
+	private String selectedVpnRegion = "";  
+	private String customProxyServer = "";     
+	private int selectedSearchEngine = 0; 	
     private boolean isTurboEnabled = false;
     private boolean isPrivateMode = false;
     private String currentVeryId = "-0";
-
     private View customView;
     private WebChromeClient.CustomViewCallback customCallback;
-
-    // === ИДЕНТИФИКАЦИЯ ДВИЖКА VIR WED ===
     private String engineName = "Vir Wed Super Engine/1.0";
     private String browserName = "Vir Ultra X";
     private String browserVersion = "1.4.3";
     private String fullBrowserString = browserName + "/" + browserVersion + " " + engineName;
 
-    // Антивирусная база угроз
     private final Set<String> dangerousDomains = new HashSet<String>(Arrays.asList(
                                                                          "malware.com",
                                                                          "phishing-site.ru",
@@ -182,7 +173,6 @@ public class MainActivity extends Activity {
 
     private String t(String ru, String en) { return lang.equals("RU") ? ru : en; }
 
-    // === ВСПОМОГАТЕЛЬНЫЕ АНИМАЦИИ ===
     private void applyClickAnimation(View view) {
         ScaleAnimation anim = new ScaleAnimation(0.92f, 1.0f, 0.92f, 1.0f,
                                                  Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
@@ -196,7 +186,6 @@ public class MainActivity extends Activity {
         view.startAnimation(anim);
     }
 
-    // === ПРИМЕНЕНИЕ ДИЗАЙНА / ТЕМЫ ===
     private void applyTheme() {
         String currentTheme = prefs.getString("app_theme", "DARK");
         int navColor = Color.parseColor("#1E1E1E");
@@ -268,7 +257,6 @@ public class MainActivity extends Activity {
         logo.startAnimation(anim);
     }
 
-    // === ПРОВЕРКА ВХОДА ===
     private void checkAccess() {
         final String savedPass = prefs.getString("master_pass", "");
         final String passType = prefs.getString("pass_type", "PIN");
@@ -380,7 +368,6 @@ public class MainActivity extends Activity {
             .setNegativeButton(t("Отмена", "Cancel"), null).show();
     }
 
-    // === СОЗДАНИЕ И НАСТРОЙКА ПАРОЛЕЙ ===
     private void showRegistration() {
         final String[] types = {
             t("PIN-код (Цифры)", "PIN Code"), 
@@ -475,7 +462,6 @@ public class MainActivity extends Activity {
             }).show();
     }
 
-    // === МАСТЕР НАСТРОЙКИ (5 ШАГОВ) ===
     private void startWizardSettings() {
         showWizardStep(1);
     }
@@ -558,20 +544,7 @@ public class MainActivity extends Activity {
 					public void onClick(DialogInterface p1, int p2)
 					{
 						Login();
-					}
-					
-
-					
-
-					
-					
-
-					
-					
-					
-
-					
-					
+					}						
                 })
                 .setNegativeButton(t("Пропустить", "Skip"), new DialogInterface.OnClickListener() {
                     @Override public void onClick(DialogInterface d, int w) {
@@ -695,27 +668,22 @@ public class MainActivity extends Activity {
         tabLayout.addView(btnMic);
         tabLayout.addView(btnSearch);
     }
-
-    // === ВЛАДКИ И ДВИЖОК ВЕБ-ПРОСМОТРА (VIR WED ENGINE) ===
 	private void createNewTab(String url) {
 		final WebView w = new WebView(this);
 		WebSettings settings = w.getSettings();
-		// Вставьте этот код внутрь метода createNewTab() к остальным настройкам settings.set...
 		if (prefs.getBoolean("wv_cache_enabled", true)) {
 			settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 		} else {
-			settings.setCacheMode(WebSettings.LOAD_NO_CACHE); // Полный запрет кэширования для экономии ОЗУ
+			settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
 		}
-		// Автоматический контроль куки для каждой новой вкладки в Vir Wed Engine
 		boolean autoCookies = prefs.getBoolean("wv_cookies_enabled", true);
 		CookieManager.getInstance().setAcceptCookie(autoCookies);
-		CookieManager.getInstance().setAcceptThirdPartyCookies(w, autoCookies); // Блокирует межсайтовую слежку, если куки выключены
+		CookieManager.getInstance().setAcceptThirdPartyCookies(w, autoCookies);
 		selectedSearchEngine = prefs.getInt("search_engine_type", 0);
 		// Применяем режим супер-экономии трафика (Только текст)
 		boolean textOnly = prefs.getBoolean("wv_text_only", false);
 		settings.setLoadsImagesAutomatically(!textOnly); 
-		
-		setupAdvancedDownloadListener(); // Запуск тотального скачивания
+		setupAdvancedDownloadListener();
 		w.setDownloadListener(new DownloadListener() {
 				@Override
 				public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
@@ -759,8 +727,6 @@ public class MainActivity extends Activity {
 					super.onPageFinished(view, url);
 					updateTabsBar();
 				}
-
-				// ИНТЕГРАЦИЯ СЕТЕВОЙ ЗАЩИТЫ: БЛОКИРОВЩИК РЕКЛАМЫ ИЗ МОДОВ (VPN ТУННЕЛЬ СРАБАТЫВАЕТ ТУТ АВТОМАТИЧЕСКИ)
 				@Override
 				public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
 					if (request != null && request.getUrl() != null) {
@@ -906,8 +872,7 @@ public class MainActivity extends Activity {
             }
         }
     }
-
-    // === ПРИВАТНЫЙ РЕЖИМ (ИНКОГНИТО) ===
+	
     private void togglePrivateMode(WebView webView) {
         isPrivateMode = !isPrivateMode;
         if (webView != null) {
@@ -939,7 +904,6 @@ public class MainActivity extends Activity {
         return dangerousDomains.contains(cleanDomain);
     }
 
-    // === МЕНЮ И НАСТРОЙКИ ===
     private void showGmailStyleMenu() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LinearLayout drawerLayout = new LinearLayout(this);
@@ -1026,19 +990,13 @@ public class MainActivity extends Activity {
 		final String savedPass = prefs.getString("master_pass", "");
 		final ArrayList<String> options = new ArrayList<String>();
 
-		// Базовые пункты меню
 		options.add(t("English","Русский"));
 		options.add(t("Выбрать дизайн / тему", "Choose Theme"));
 		options.add(t("Перепройти Мастер настройки", "Run Setup Wizard"));
 		options.add(t("Показать Лицензию", "Show License"));
-
-		// ВСТАВЛЯЕМ НАШ СИСТЕМНЫЙ УСТАНОВЩИК МОДОВ СЮДА
 		options.add("🛠️ Mod Setup Manager");
-
-		// НОВОЕ: Вставляем выбор поисковой системы
 		options.add(t("🔍 Поисковая система", "🔍 Search Engine"));
 
-		// Пункты защиты (динамические)
 		if (!savedPass.isEmpty()) {
 			options.add(t("Изменить пароль/защиту", "Change Password"));
 			options.add(t("Отключить защиту", "Disable Security"));
@@ -1046,7 +1004,6 @@ public class MainActivity extends Activity {
 			options.add(t("Включить защиту (Создать пароль)", "Enable Security"));
 		}
 
-		// Технические данные версии
 		options.add(t("Версия:", "Ver:") + VERSION);
 		options.add("VirWed:1.0");
 
@@ -1057,7 +1014,6 @@ public class MainActivity extends Activity {
 			.setItems(settingsMenu, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface d, int i) {
-					// Получаем точный текст пункта, на который нажал пользователь
 					String selectedItem = settingsMenu[i];
 
 					if (i == 0) {
@@ -1071,22 +1027,19 @@ public class MainActivity extends Activity {
 					} else if (i == 3) {
 						showLicenseDialog();
 					} 
-					// ОБРАБОТКА НАЖАТИЯ НА МЕНЕДЖЕР МОДОВ
 					else if (selectedItem.equals(t("🛠️ Менеджер модов (Mod Setup)", "🛠️ Mod Setup Manager"))) {
 						showModSetupManager();
-					} 
-					// НОВОЕ: ОБРАБОТКА ВЫБОРА ПОИСКОВИКА
+					}
 					else if (selectedItem.equals(t("🔍 Поисковая система", "🔍 Search Engine"))) {
 						showSearchEngineDialog(); // Открывает окно выбора Google/Яндекс/DuckDuckGo/Trashbox
 					}
-					// ДИНАМИЧЕСКАЯ ОБРАБОТКА КНОПОК БЕЗОПАСНОСТИ
 					else if (selectedItem.equals(t("Изменить пароль/защиту", "Change Password")) || 
 							 selectedItem.equals(t("Включить защиту (Создать пароль)", "Enable Security"))) {
 						showRegistration();
 					} else if (selectedItem.equals(t("Отключить защиту (Удалить пароль)", "Disable Security"))) {
 						prefs.edit().putString("master_pass", "").putString("pass_type", "").putString("recovery_key", "").apply();
 						Toast.makeText(getApplicationContext(), t("Защита полностью отключена!", "Security disabled!"), Toast.LENGTH_SHORT).show();
-						showSettings(); // Перезапускаем меню, чтобы обновить пункты
+						showSettings();
 					}
 				}
 			}).show();
@@ -1152,7 +1105,6 @@ public class MainActivity extends Activity {
 					if (i == 18) showPasswordManager();
 					if (i == 19) showSleepTimerDialog();
 					if (i == 20) showVpnManagerDialog();
-					// НАЗНАЧАЕМ ИНДЕКСЫ ДЛЯ НАШИХ ФУНКЦИЙ
 					if (i == 21) toggleElementInspector();
 					if (i == 22) toggleTextOnlyMode();
 					if (i == 23) toggleAntiSpyMode();
@@ -1161,7 +1113,6 @@ public class MainActivity extends Activity {
 	}
 	
 
-    // === ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ И УТИЛИТЫ ===
     private void toggleTurbo() {
         isTurboEnabled = !isTurboEnabled;
         if (currentWeb != null) {
@@ -1171,17 +1122,6 @@ public class MainActivity extends Activity {
         }
         Toast.makeText(this, isTurboEnabled ? "Турборежим ВКЛ" : "Турборежим ВЫКЛ", Toast.LENGTH_SHORT).show();
     }
-
-    
-
-                
-         
-     
-  
-
-    
-
-    // Класс-модель для заметки (можно вставить прямо в класс приложения)
 	public static class Note {
 		public String title;
 		public String text;
@@ -1192,7 +1132,6 @@ public class MainActivity extends Activity {
 		}
 	}
 
-// Метод загрузки списка заметок из SharedPreferences
 	private ArrayList<Note> loadNotes() {
 		ArrayList<Note> list = new ArrayList<>();
 		String jsonString = prefs.getString("user_notes_list", "[]");
@@ -1207,8 +1146,6 @@ public class MainActivity extends Activity {
 		}
 		return list;
 	}
-
-// Метод сохранения списка заметок в SharedPreferences
 	private void saveNotes(ArrayList<Note> list) {
 		JSONArray jsonArray = new JSONArray();
 		try {
@@ -1223,8 +1160,6 @@ public class MainActivity extends Activity {
 		}
 		prefs.edit().putString("user_notes_list", jsonArray.toString()).apply();
 	}
-
-// ВАШ ОБНОВЛЕННЫЙ МЕТОД: Главный экран со списком заметок
 	private void showNotes() {
 		final ArrayList<Note> notesList = loadNotes();
 
@@ -1244,7 +1179,6 @@ public class MainActivity extends Activity {
 						// Нажата кнопка создания новой
 						showEditNoteDialog(notesList, null, -1);
 					} else {
-						// Открываем существующую заметку во весь экран
 						showFullNoteDialog(notesList, which);
 					}
 				}
@@ -1252,19 +1186,16 @@ public class MainActivity extends Activity {
 			.setNegativeButton(t("Закрыть", "Close"), null)
 			.show();
 	}
-
-// 1. Полноэкранный просмотр заметки
 	private void showFullNoteDialog(final ArrayList<Note> notesList, final int index) {
 		final Note note = notesList.get(index);
 
-		// Используем стандартную системную тему на весь экран
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, android.R.style.Theme_Material_Light_NoActionBar_Fullscreen);
 
 		ScrollView scrollView = new ScrollView(this);
 		TextView textView = new TextView(this);
 		textView.setText(note.text);
 		textView.setTextSize(18);
-		int padding = 45; // Хорошие отступы для текста
+		int padding = 45;
 		textView.setPadding(padding, padding, padding, padding);
 		scrollView.addView(textView);
 
@@ -1288,26 +1219,21 @@ public class MainActivity extends Activity {
 			.setNegativeButton(t("Назад", "Back"), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					showNotes(); // Возврат к списку
+					showNotes();
 				}
 			});
 
 		builder.show();
 	}
 
-// 2. Окно создания и редактирования имени/текста
 	private void showEditNoteDialog(final ArrayList<Note> notesList, final Note note, final int index) {
 		LinearLayout layout = new LinearLayout(this);
 		layout.setOrientation(LinearLayout.VERTICAL);
 		layout.setPadding(50, 30, 50, 30);
-
-		// Поле ввода имени
 		final EditText titleInput = new EditText(this);
 		titleInput.setHint(t("Название заметки", "Note Title"));
 		if (note != null) titleInput.setText(note.title);
 		layout.addView(titleInput);
-
-		// Поле ввода контента
 		final EditText textInput = new EditText(this);
 		textInput.setHint(t("Текст заметки", "Note Text"));
 		textInput.setGravity(Gravity.TOP);
@@ -1335,22 +1261,20 @@ public class MainActivity extends Activity {
 						note.text = text;
 					}
 
-					saveNotes(notesList); // Запись в SharedPreferences
+					saveNotes(notesList);
 					Toast.makeText(MainActivity.this, t("Сохранено", "Saved"), Toast.LENGTH_SHORT).show();
-					showNotes(); // Перезапуск главного списка
+					showNotes();
 				}
 			})
 			.setNegativeButton(t("Отмена", "Cancel"), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					showNotes(); // Назад к списку
+					showNotes();
 				}
 			})
 			.show();
 	}
 	
-
-    // === ЗАКЛАДКИ С ВОЗМОЖНОСТЬЮ ОТКРЫТИЯ В ВЕБ-ВКЛАДКАХ ===
     private void showBookmarks() {
         final String currentUrl = (currentWeb != null) ? currentWeb.getUrl() : "";
         final String savedBookmarks = prefs.getString("bookmarks_list", "");
@@ -1449,7 +1373,6 @@ public class MainActivity extends Activity {
 			.setPositiveButton(t("Поддержать рублём", "Donate"), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// Замените ссылку ниже на ваш кошелек (ЮMoney, Cloudtips, Boosty и т.д.)
 					String donateUrl = "https://www.donationalerts.com/r/dev_egor_vir";
 					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(donateUrl));
 					context.startActivity(intent);
@@ -1459,8 +1382,6 @@ public class MainActivity extends Activity {
 			.show();
 	}
 	
-
-    // === ДОРАБОТАННЫЙ СЕЙФ (VAULT) ===
     private void openSafeVault() {
         final String savedPass = prefs.getString("master_pass", "");
         if (!savedPass.isEmpty()) {
@@ -1577,12 +1498,10 @@ public class MainActivity extends Activity {
                 }
             }).setNegativeButton(t("Отмена", "Cancel"), null).show();
     }
-	private int selectedBackupType = 0;   // 0: G, 1: Ultra, 2: Low
-	private int selectedFormat = 0;       // 0: .dek, 1: .zip, 2: .lut
-	private int selectedUnloadMode = 0;   // 0: Vor, 1: Vir Class
-	private int autoDeleteDays = 60;      // Срок хранения снимков (по умолчанию 60)
-	
-	// Главная точка входа: Меню Бэкап-Менеджера
+	private int selectedBackupType = 0;   
+	private int selectedFormat = 0;      
+	private int selectedUnloadMode = 0;  
+	private int autoDeleteDays = 60;      
 	private void showBackupManager() {
 		String[] menuItems = new String[] {
 			t("⚙️ Настроить тип снимка", "⚙️ Configure snapshot type"),
@@ -1609,8 +1528,6 @@ public class MainActivity extends Activity {
 			.setNegativeButton(t("Закрыть", "Close"), null)
 			.show();
 	}
-
-// 1. Выбор типа снимка (G, Ultra, Low)
 	private void showBackupTypeDialog() {
 		String[] types = new String[] {
 			"G — " + t("Чисто данные (Вкладки, история)", "Data only"),
@@ -1623,21 +1540,18 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					selectedBackupType = which;
-					// .lut формат доступен ТОЛЬКО на Ultra режиме
 					if (selectedBackupType != 1 && selectedFormat == 2) {
-						selectedFormat = 0; // Сбрасываем на .dek, если ушли с Ultra
+						selectedFormat = 0;
 					}
 					dialog.dismiss();
 				}
 			}).show();
 	}
-
-// 2. Выбор формата (.dek, .zip, .lut)
 	private void showFormatDialog() {
 		ArrayList<String> formats = new ArrayList<>();
 		formats.add(".dek — " + t("Стандартный", "Standard"));
 		formats.add(".zip — " + t("Открытый", "Open archive"));
-		if (selectedBackupType == 1) { // Доступно только на Ultra
+		if (selectedBackupType == 1) {
 			formats.add(".lut — " + t("Закрытый (Только для Ultra)", "Encrypted"));
 		}
 
@@ -1653,7 +1567,6 @@ public class MainActivity extends Activity {
 			}).show();
 	}
 
-// 3. Как выгружать/восстанавливать (Vor, Vir Class)
 	private void showUnloadModeDialog() {
 		String[] modes = new String[] {
 			"Vor — " + t("Обычный (Мягкое слияние данных)", "Normal"),
@@ -1673,8 +1586,6 @@ public class MainActivity extends Activity {
 				}
 			}).show();
 	}
-
-// 4. Когда удалять старые снимки (60-90 дней)
 	private void showExpirationDialog() {
 		String[] days = new String[] { t("60 дней", "60 days"), t("90 дней", "90 days") };
 		int checkedIndex = (autoDeleteDays == 90) ? 1 : 0;
@@ -1688,12 +1599,11 @@ public class MainActivity extends Activity {
 				public void onClick(DialogInterface dialog, int which) {
 					autoDeleteDays = (which == 1) ? 90 : 60;
 					dialog.dismiss();
-					cleanOldBackups(); // Запуск фоновой очистки
+					cleanOldBackups();
 				}
 			}).show();
 	}
 
-// Функция получения целевой папки бэкапов
 	private File getBackupDirectory() {
 		File backupDir = new File(Environment.getExternalStorageDirectory(), "Buckaps/Browser#VIR");
 		if (!backupDir.exists()) {
@@ -1702,8 +1612,6 @@ public class MainActivity extends Activity {
 		return backupDir;
 	}
 
-// 5. Просмотр существующих снимков и их выгрузка (восстановление)
-	// Главное окно со списком всех файлов бэкапа
 	private void showCurrentSnapshotsDialog() {
 		File dir = getBackupDirectory();
 		final File[] files = dir.listFiles();
@@ -1723,15 +1631,12 @@ public class MainActivity extends Activity {
 			.setItems(fileNames, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// Вместо вложенного диалога просто вызываем отдельный метод!
 					showSnapshotActionMenu(files[which]);
 				}
 			})
 			.setNegativeButton(t("Назад", "Back"), null)
 			.show();
 	}
-
-// Отдельный чистый метод для выбора действия с конкретным файлом
 	private void showSnapshotActionMenu(final File selectedFile) {
 		new AlertDialog.Builder(MainActivity.this)
 			.setTitle(selectedFile.getName())
@@ -1761,46 +1666,41 @@ public class MainActivity extends Activity {
 			.setNegativeButton(t("Назад", "Back"), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					showCurrentSnapshotsDialog(); // Возвращаем пользователя назад к списку файлов
+					showCurrentSnapshotsDialog();
 				}
 			})
 			.show();
 	}
 	
 	
-	
-
-// 6. Логика СОЗДАНИЯ снимка
 	private void executeBackupCreation() {
 		try {
 			File dir = getBackupDirectory();
 
-			// Генерируем расширение файла на основе настроек
+			
 			String ext = ".dek";
 			if (selectedFormat == 1) ext = ".zip";
 			if (selectedFormat == 2 && selectedBackupType == 1) ext = ".lut";
 
-			// Формируем имя файла: Снимок_Дата_Тип.расширение
 			String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
 			String typeLabel = selectedBackupType == 0 ? "_G" : (selectedBackupType == 1 ? "_Ultra" : "_Low");
 			File backupFile = new File(dir, "Snapshot_" + timeStamp + typeLabel + ext);
 
 			JSONObject backupData = new JSONObject();
 
-			// Собираем данные в зависимости от выбранного режима
 			if (selectedBackupType == 0 || selectedBackupType == 1) {
-				// Режимы G и Ultra собирают данные вкладок и истории
+				
 				backupData.put("tabs_list", prefs.getString("user_notes_list", "[]"));
 				backupData.put("history", prefs.getString("pm_database", "[]"));
 			}
 			if (selectedBackupType == 2 || selectedBackupType == 1) {
-				// Режимы Low и Ultra собирают настройки
+
 				backupData.put("master_key", prefs.getString("pm_master_key", ""));
 				backupData.put("simple_db", prefs.getString("pm_simple_database", ""));
 				backupData.put("timer_days", autoDeleteDays);
 			}
 
-			// Запись в файл
+
 			FileWriter writer = new FileWriter(backupFile);
 			writer.write(backupData.toString());
 			writer.flush();
@@ -1817,10 +1717,9 @@ public class MainActivity extends Activity {
 		}
 	}
 
-// 7. Логика ВЫГРУЗКИ (Восстановления) снимка в систему
 	private void executeRestore(File file) throws IOException, JSONException {
 		try {
-			// Чтение файла бэкапа
+
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			StringBuilder sb = new StringBuilder();
 			String line;
@@ -1831,11 +1730,10 @@ public class MainActivity extends Activity {
 
 			JSONObject backupData = new JSONObject(sb.toString());
 
-			// ЕСЛИ РЕЖИМ VIR CLASS (ПОЛНАЯ ВЫГРУЗКА) — сначала полностью всё стираем
 			if (selectedUnloadMode == 1 && selectedBackupType == 1) {
-				prefs.edit().clear().apply(); // Полная зачистка всех SharedPreferences приложения!
+				prefs.edit().clear().apply(); 
 				if (tabList != null) tabList.clear();
-				} // Вставляем данные обратно в систему
+				} 
 				if (backupData.has("tabs_list")) 
 					{
 						prefs.edit().putString("user_notes_list", backupData.getString("tabs_list")).apply();
@@ -1849,8 +1747,7 @@ public class MainActivity extends Activity {
 								if (backupData.has("simple_db")) {
 									prefs.edit().putString("pm_simple_database", backupData.getString("simple_db")).apply();
 									}
-									Toast.makeText(this, t("🔄 Данные снимка успешно выгружены в браузер!", "🔄 Snapshot applied successfully!"), Toast.LENGTH_LONG).show();// Перезапускаем менеджеры для обновления интерфей
-			саshowNotes();}
+									Toast.makeText(this, t("🔄 Данные снимка успешно выгружены в браузер!", "🔄 Snapshot applied successfully!"), Toast.LENGTH_LONG).show();
 		catch (Exception e)
 		{e.printStackTrace();Toast.makeText(this, "Restore error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
@@ -1861,15 +1758,12 @@ public class MainActivity extends Activity {
 		// TODO: Implement this method
 	}
 
-	
-		// TODO: Implement this method
-	// 8. Автоматическая очистка старых снимков (60-90 дней)
 	private void cleanOldBackups() {
 		File dir = getBackupDirectory();
 		File[] files = dir.listFiles();
 		if (files == null) return;
 
-		// ИСПРАВЛЕНО: добавлено объявление long и знак равенства
+		
 		long maxLifetimeMillis = (long) autoDeleteDays * 24 * 60 * 60 * 1000;
 		long currentTime = System.currentTimeMillis();
 
@@ -1882,11 +1776,9 @@ public class MainActivity extends Activity {
 	}
 	
 	private void manageCookies(final WebView webView) {
-		// 1. Считываем глобальное разрешение на куки из SharedPreferences (по умолчанию true - разрешены)
 		final boolean isCookiesEnabled = prefs.getBoolean("wv_cookies_enabled", true);
 		String cookieStatusLabel = isCookiesEnabled ? "🟢 " + t("РАЗРЕШЕНЫ", "ALLOWED") : "🔴 " + t("ЗАБЛОКИРОВАНЫ", "BLOCKED");
 
-		// 2. Получаем строку куки для текущего сайта
 		String currentUrl = (webView != null) ? webView.getUrl() : "";
 		ArrayList<String> cookieList = new ArrayList<String>();
 
@@ -1901,7 +1793,7 @@ public class MainActivity extends Activity {
 			}
 		}
 
-		// 3. Формируем текстовый блок со списком куки для отображения
+		
 		StringBuilder cookieDisplay = new StringBuilder();
 		cookieDisplay.append(t("Статус куки в браузере: ", "Global Status: ")).append(cookieStatusLabel).append("\n\n");
 
@@ -1914,7 +1806,6 @@ public class MainActivity extends Activity {
 			}
 		}
 
-		// 4. Опции меню управления
 		String[] options = new String[] {
 			t("🧹 Полная очистка ВСЕХ куки", "🧹 Clear ALL cookies"),
 			t("⚙️ Очистить только нерабочие/устаревшие куки", "⚙️ Clear expired/broken cookies"),
@@ -1937,31 +1828,31 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if (which == 0) {
-						// А: Полная очистка
+
 						CookieManager.getInstance().removeAllCookies(null);
-						CookieManager.getInstance().flush(); // Жестко выталкиваем изменения в память устройства
+						CookieManager.getInstance().flush();
 						Toast.makeText(MainActivity.this, t("🍪 Все куки успешно стёрты!", "🍪 All cookies cleared!"), Toast.LENGTH_SHORT).show();
-						manageCookies(webView); // Перезапускаем меню для обновления интерфейса
+						manageCookies(webView); 
 					} 
-						// Б: Удаление просроченных и нерабочих куки
+
 						else if (which == 1) {
-							// Б: Удаление временных куки сессий (замена удаленного removeExpiredCookies)
+						
 							CookieManager.getInstance().removeSessionCookies(null); 
 							CookieManager.getInstance().flush();
 
 							Toast.makeText(MainActivity.this, t("⚙️ Временные куки сессий очищены!", "⚙️ Session cookies removed!"), Toast.LENGTH_SHORT).show();
-							manageCookies(webView); // Перезапускаем меню для обновления списка
+							manageCookies(webView);
 						}
 						
 					else if (which == 2) {
-						// В: Переключение глобального тумблера разрешений
+
 						boolean newCookieState = !isCookiesEnabled;
 						prefs.edit().putBoolean("wv_cookies_enabled", newCookieState).apply();
 
-						// Применяем настройки к системному менеджеру прямо сейчас
+					
 						CookieManager.getInstance().setAcceptCookie(newCookieState);
 						if (webView != null) {
-							// Разрешение/блокировка куки для сторонних запросов (рекламные трекеры)
+						
 							CookieManager.getInstance().setAcceptThirdPartyCookies(webView, newCookieState);
 						}
 
@@ -1975,28 +1866,26 @@ public class MainActivity extends Activity {
 	}
 	
 
-    // Главный метод: Управление кэшем браузера
 	private void showCacheManager() {
-		// 1. Считываем из prefs статус: включен кэш или отключен (по умолчанию true - включен)
+		
 		final boolean isCacheEnabled = prefs.getBoolean("wv_cache_enabled", true);
 		String cacheStatusLabel = isCacheEnabled ? "🟢 " + t("ВКЛЮЧЕН", "ENABLED") : "🔴 " + t("ОТКЛЮЧЕН (Экономия памяти)", "DISABLED");
 
-		// 2. Рассчитываем размер кэша WebView на флешке устройства
 		long cacheSizeByte = 0;
 		try {
-			File cacheDir = getCacheDir(); // Внутренний системный кэш приложения
+			File cacheDir = getCacheDir(); 
 			if (cacheDir != null && cacheDir.exists()) {
-				// Считаем размер файлов рекурсивным методом
+			
 				cacheSizeByte = getFolderSize(cacheDir);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		// Переводим байты в удобные Мегабайты
+
 		double cacheSizeMb = (double) cacheSizeByte / (1024 * 1024);
 		String sizeText = String.format(java.util.Locale.US, "%.2f MB", cacheSizeMb);
 
-		// 3. Формируем меню опций
+		
 		String[] cacheOptions = new String[] {
 			t("🧹 Мгновенно очистить кэш", "🧹 Clear cache now"),
 			isCacheEnabled ? t("🚫 Полностью ОТКЛЮЧИТЬ кэш", "🚫 DISABLE cache") : t("🔄 Включить кэш обратно", "🔄 ENABLE cache")
@@ -2009,7 +1898,7 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if (which == 0) {
-						// Кнопка 1: Полная очистка
+						
 						if (currentWeb != null) {
 							currentWeb.clearCache(true);
 						}
@@ -2017,23 +1906,23 @@ public class MainActivity extends Activity {
 						showCacheManager(); // Перезапускаем меню для обновления размера на 0.00 MB
 					} 
 					else if (which == 1) {
-						// Кнопка 2: Тумблер включения/выключения
+		
 						boolean newCacheState = !isCacheEnabled;
 						prefs.edit().putBoolean("wv_cache_enabled", newCacheState).apply();
 
-						// Сразу применяем настройки к текущей открытой вкладке
+						
 						if (currentWeb != null) {
 							WebSettings settings = currentWeb.getSettings();
 							if (newCacheState) {
-								settings.setCacheMode(WebSettings.LOAD_DEFAULT); // Стандартный режим
+								settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 							} else {
-								settings.setCacheMode(WebSettings.LOAD_NO_CACHE); // Запрет сохранять кэш на диск
-								currentWeb.clearCache(true); // Стираем остатки
+								settings.setCacheMode(WebSettings.LOAD_NO_CACHE); 
+								currentWeb.clearCache(true); 
 							}
 						}
 
 						Toast.makeText(MainActivity.this, t("Настройки кэша изменены!", "Cache settings updated!"), Toast.LENGTH_SHORT).show();
-						showCacheManager(); // Перезапускаем окно для обновления статуса
+						showCacheManager();
 					}
 				}
 			})
@@ -2041,7 +1930,6 @@ public class MainActivity extends Activity {
 			.show();
 	}
 
-// Вспомогательный метод для подсчета веса папки с кэшем в байтах
 	private long getFolderSize(File folder) {
 		long length = 0;
 		File[] files = folder.listFiles();
@@ -2058,7 +1946,6 @@ public class MainActivity extends Activity {
 	}
 	
 
-    // === ПЕРЕВОДЧИК САЙТОВ С ВЫБОРОМ ЯЗЫКА ===
     private void showTranslatorDialog() {
         final String[] languages = {
             "🇷🇺 Русский (RU)",
@@ -2181,8 +2068,6 @@ public class MainActivity extends Activity {
                 @Override public void onClick(DialogInterface d, int w) { finish(); }
             }).show();
     }
-
-    // === КАСТОМНЫЙ ГРАФИЧЕСКИЙ КЛЮЧ ===
     private static class PatternLockView extends View {
         public interface OnPatternListener { void onPatternEntered(String pattern); }
         private OnPatternListener listener;
@@ -2269,11 +2154,8 @@ public class MainActivity extends Activity {
             }
         }
 	}
-	// Главный метод: открывает блокнот с паролями. Если мастер-пароль задан — сначала просит его ввести.
 	private void showPasswordManager() {
 		final String masterKey = prefs.getString("pm_master_key", "");
-
-		// Если мастер-пароль еще не создан, сразу предлагаем его установить
 		if (masterKey.isEmpty()) {
 			final EditText setupInput = new EditText(MainActivity.this);
 			setupInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -2292,7 +2174,7 @@ public class MainActivity extends Activity {
 						String key = setupInput.getText().toString().trim();
 						if (!key.isEmpty()) {
 							prefs.edit().putString("pm_master_key", key).apply();
-							openSimplePasswordEditor(); // Открываем базу
+							openSimplePasswordEditor();
 						}
 					}
 				})
@@ -2300,7 +2182,6 @@ public class MainActivity extends Activity {
 			return;
 		}
 
-		// Если мастер-пароль уже есть — запрашиваем ввод для входа
 		final EditText loginInput = new EditText(MainActivity.this);
 		loginInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 		loginInput.setHint(t("Входной пароль/ПИН", "Password/PIN"));
@@ -2317,7 +2198,7 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if (loginInput.getText().toString().equals(masterKey)) {
-						openSimplePasswordEditor(); // Пароль верный — открываем базу
+						openSimplePasswordEditor();
 					} else {
 						Toast.makeText(MainActivity.this, t("Неверно!", "Wrong!"), Toast.LENGTH_SHORT).show();
 					}
@@ -2325,14 +2206,10 @@ public class MainActivity extends Activity {
 			})
 			.setNegativeButton(t("Отмена", "Cancel"), null).show();
 	}
-
-// Полноэкранный сейф-блокнот, где хранятся все ваши логины и пароли в текстовом виде
 	private void openSimplePasswordEditor() {
 		final EditText editorInput = new EditText(MainActivity.this);
 		editorInput.setGravity(Gravity.TOP);
 		editorInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
-
-		// Загружаем сохраненный текст аккаунтов. Если там пусто — показываем пример для пользователя
 		String defaultText = "4PDA:\nЛогин: my_user\nПароль: 123456\n\nGitHub:\nЛогин: user2\nПароль: qwerty";
 		editorInput.setText(prefs.getString("pm_simple_database", defaultText));
 
@@ -2347,7 +2224,6 @@ public class MainActivity extends Activity {
 			.setPositiveButton(t("Сохранить изменения", "Save"), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// Сохраняем весь отредактированный текст одной строкой
 					prefs.edit().putString("pm_simple_database", editorInput.getText().toString()).apply();
 					Toast.makeText(MainActivity.this, t("Сохранено!", "Saved!"), Toast.LENGTH_SHORT).show();
 				}
@@ -2355,20 +2231,15 @@ public class MainActivity extends Activity {
 			.setNeutralButton(t("Сбросить Мастер-код", "Reset PIN"), new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// Полностью удаляет входной пароль, при следующем входе программа попросит создать новый
 					prefs.edit().remove("pm_master_key").apply();
 					Toast.makeText(MainActivity.this, t("Мастер-код сброшен!", "PIN reset!"), Toast.LENGTH_SHORT).show();
 				}
 			})
 			.setNegativeButton(t("Закрыть", "Close"), null).show();
 	}
-	// Переменная для управления таймером (объявите её вверху класса к остальным переменным)
 	private Handler sleepTimerHandler;
 	private Runnable sleepTimerRunnable;
-
-// Главный метод: открывает диалог выбора времени таймера сна
 	private void showSleepTimerDialog() {
-		// Список вариантов времени для выгрузки вкладок
 		final String[] timeOptions = new String[]{
 			t("Выключить таймер", "Turn off timer"),
 			t("5 минут", "5 minutes"),
@@ -2377,13 +2248,12 @@ public class MainActivity extends Activity {
 			t("1 час", "1 hour")
 		};
 
-		// Перевод вариантов времени в миллисекунды
 		final long[] timeValues = new long[]{
-			0,                  // Выкл
-			5 * 60 * 1000,      // 5 мин
-			15 * 60 * 1000,     // 15 мин
-			30 * 60 * 1000,     // 30 мин
-			60 * 60 * 1000      // 1 час
+			0,                  
+			5 * 60 * 1000,      
+			15 * 60 * 1000,     
+			30 * 60 * 1000,    
+			60 * 60 * 1000      
 		};
 
 		new AlertDialog.Builder(MainActivity.this)
@@ -2391,13 +2261,13 @@ public class MainActivity extends Activity {
 			.setItems(timeOptions, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// Если запущен старый таймер — останавливаем его
+					
 					stopSleepTimer();
 
 					long selectedTime = timeValues[which];
 
 					if (selectedTime > 0) {
-						// Запуск нового таймера
+
 						startSleepTimer(selectedTime);
 						Toast.makeText(MainActivity.this, t("Таймер запущен на: ", "Timer set to: ") + timeOptions[which], Toast.LENGTH_SHORT).show();
 					} else {
@@ -2409,31 +2279,28 @@ public class MainActivity extends Activity {
 			.show();
 	}
 
-// Запуск фонового отсчета времени
 	private void startSleepTimer(long delayMillis) {
 		sleepTimerHandler = new Handler(Looper.getMainLooper());
 		sleepTimerRunnable = new Runnable() {
 			@Override
 			public void run() {
-				// Вызываем очистку памяти вкладок
+
 				unloadTabsToFreeRAM();
 			}
 		};
-		// Отправляем задачу на выполнение через выбранное время
+		
 		sleepTimerHandler.postDelayed(sleepTimerRunnable, delayMillis);
 	}
 
-// Остановка таймера
 	private void stopSleepTimer() {
 		if (sleepTimerHandler != null && sleepTimerRunnable != null) {
 			sleepTimerHandler.removeCallbacks(sleepTimerRunnable);
 		}
 	}
 
-// Исправленный метод жесткой выгрузки всех вкладок из оперативной памяти
 	private void unloadTabsToFreeRAM() {
 		try {
-			// Очищаем и выгружаем абсолютно все открытые вкладки из списка
+
 			if (tabList != null && !tabList.isEmpty()) {
 				for (int i = 0; i < tabList.size(); i++) {
 					WebView w = tabList.get(i);
@@ -2441,12 +2308,12 @@ public class MainActivity extends Activity {
 						w.stopLoading();
 						w.clearHistory();
 						w.clearCache(true);
-						w.loadUrl("about:blank"); // Сбрасываем тяжелый контент страницы
+						w.loadUrl("about:blank"); 
 					}
 				}
 			}
 
-			// Дополнительно очищаем текущую активную вкладку, если она задана отдельно
+			
 			if (currentWeb != null) {
 				currentWeb.stopLoading();
 				currentWeb.clearHistory();
@@ -2467,7 +2334,6 @@ public class MainActivity extends Activity {
 	}
 	
 
-	// 1. ТОЧКА ВХОДА: Главное окно «Загрузчик модов 1.0»
 	private void showModSetupManager() {
 		File baseDir = new File(getExternalFilesDir(null), "mod/noads/");
 		File manifestFile = new File(baseDir, "Ver.v");
@@ -2517,7 +2383,7 @@ public class MainActivity extends Activity {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					if (which == 0) {
-						checkSetupDataAndInstall(); // Идёт проверять папку Data и файл Setup.data
+						checkSetupDataAndInstall(); 
 					} else if (which == 1) {
 						executeModDeletion();
 					}
@@ -2527,22 +2393,20 @@ public class MainActivity extends Activity {
 			.show();
 	}
 
-// 2. ПРОВЕРКА КЭША И ПАПКИ DATA
-	// 2. ИСПРАВЛЕННАЯ ПРОВЕРКА КЭША И ПРИНУДИТЕЛЬНОЕ СОЗДАНИЕ ПАПКИ DATA
+
 	private void checkSetupDataAndInstall() {
 		try {
-			// Указываем путь к папке мода в открытом кэше: Android/data/com.vir.brower/files/mod/noads/
+			
 			File baseDir = new File(getExternalFilesDir(null), "mod/noads/");
 			File dataDir = new File(baseDir, "Data");
 
-			// ШАГ 1: Жестко и принудительно создаем папку Data на флешке
+			
 			if (!dataDir.exists()) {
 				dataDir.mkdirs(); 
 			}
 
 			File setupDataFile = new File(dataDir, "Setup.data");
 
-			// ШАГ 2: Записываем вашу структуру данных в файл Setup.data
 			FileWriter writer = new FileWriter(setupDataFile);
 			writer.write("Data\n");
 			writer.write("Data.setup\n");
@@ -2550,12 +2414,12 @@ public class MainActivity extends Activity {
 			writer.write("min=1\n");
 			writer.write("max=1000\n");
 			writer.write("Format=MB\n");
-			writer.write("safe.root->super.on\n"); // Главный ключ доступа
+			writer.write("safe.root->super.on\n"); 
 			writer.write("}\n");
-			writer.flush(); // Принудительно выталкиваем данные из ОЗУ на физический диск телефона
+			writer.flush(); 
 			writer.close();
 
-			// ШАГ 3: Начинаем читать только что созданный Setup.data для проверки безопасности
+		
 			BufferedReader br = new BufferedReader(new FileReader(setupDataFile));
 			String line;
 			boolean hasSuperOn = false;
@@ -2565,7 +2429,7 @@ public class MainActivity extends Activity {
 			while ((line = br.readLine()) != null) {
 				line = line.trim();
 
-				// Парсинг числовых параметров с очисткой от мусора
+			
 				if (line.contains("min=")) {
 					minVal = Integer.parseInt(line.split("=")[1].replace(";", "").trim());
 				}
@@ -2573,14 +2437,14 @@ public class MainActivity extends Activity {
 					maxVal = Integer.parseInt(line.split("=")[1].replace(";", "").trim());
 				}
 
-				// Проверяем наличие строки super.on
+
 				if (line.contains("safe.root->super.on")) {
 					hasSuperOn = true;
 				}
 			}
 			br.close();
 
-			// ШАГ 4: Проверка флага безопасности
+			
 			if (!hasSuperOn) {
 				Toast.makeText(this, t("❌ Ошибка: Нет safe.root->super.on!", "❌ Error: safe.root->super.on missing!"), Toast.LENGTH_LONG).show();
 				return; 
@@ -2596,7 +2460,7 @@ public class MainActivity extends Activity {
 	}
 	
 
-// 3. УСТАНОВКА КОДА МОДА
+
 	private void executeModInstallation() {
 		try {
 			File baseDir = new File(getExternalFilesDir(null), "mod/noads/");
@@ -2616,7 +2480,7 @@ public class MainActivity extends Activity {
 			isModNoAdsInstalled = true;
 			prefs.edit().putBoolean("noads_installed", true).apply();
 
-			showModSetupManager(); // Обновляем экран загрузчика
+			showModSetupManager();
 			Toast.makeText(this, t("🎉 Модификация успешно активирована!", "🎉 Modification active!"), Toast.LENGTH_SHORT).show();
 
 		} catch (Exception e) {
@@ -2625,11 +2489,10 @@ public class MainActivity extends Activity {
 		}
 	}
 
-// 4. УДАЛЕНИЕ КЭША МОДА
 	private void executeModDeletion() {
 		File baseDir = new File(getExternalFilesDir(null), "mod/noads/");
 		if (baseDir.exists()) {
-			deleteDirectoryRecursive(baseDir); // Удалит и Code, и Data со всеми файлами
+			deleteDirectoryRecursive(baseDir); 
 		}
 
 		isModNoAdsInstalled = false;
@@ -2644,26 +2507,24 @@ public class MainActivity extends Activity {
 		// TODO: Implement this method
 	}
 	
-	// Обновленный метод: Выбор регионов (С поддержкой FREE пользователей)
+	
 	private void showVpnManagerDialog() {
-	// Обновленный метод: Выбор регионов (С поддержкой FREE, PRO и PREMIUM)
-		// Обновляем статусы подписок из кэша Vir Market
+	
 		isUserProStatus = prefs.getBoolean("market_pro_activated", false);
 		isUserPremiumStatus = prefs.getBoolean("market_premium_activated", false);
 
-		// Списки серверов
+
 		final ArrayList<String> regionNames = new ArrayList<String>();
 		final ArrayList<String> regionIps = new ArrayList<String>();
 
-		// 1. БЕСПЛАТНЫЙ РЕГИОН №1 (FREE)
+
 		regionNames.add("🇩🇪 Germany [FREE]");
 		regionIps.add("46.229.20.10:8080"); 
 
-		// 2. БЕСПЛАТНЫЙ РЕГИОН №2 (FREE)
 		regionNames.add("🇺🇸 USA [FREE]");
 		regionIps.add("142.250.74.46:3128");
 
-		// 3. VIP СЕРВЕРА (Требуют PRO или PREMIUM от Vir Market)
+	
 		if (isUserProStatus || isUserPremiumStatus) {
 			regionNames.add("🇳🇱 Netherlands [Fast] (VIP)");
 			regionIps.add("185.200.11.5:80");
@@ -2686,7 +2547,7 @@ public class MainActivity extends Activity {
 				public void onClick(DialogInterface dialog, int which) {
 					String targetIp = regionIps.get(which);
 
-					// Защита: срез для платных регионов
+				
 					if ("LOCKED".equals(targetIp)) {
 						new AlertDialog.Builder(MainActivity.this)
 							.setTitle(t("🔒 Доступ ограничен", "🔒 Access Denied"))
@@ -2697,7 +2558,7 @@ public class MainActivity extends Activity {
 						return;
 					}
 
-					// ИСПРАВЛЕНО: Безопасное извлечение названия региона без ошибок split
+					
 					String fullTitle = regionNames.get(which);
 					if (fullTitle.contains("[")) {
 						selectedVpnRegion = fullTitle.substring(0, fullTitle.indexOf("[")).trim();
@@ -2707,7 +2568,6 @@ public class MainActivity extends Activity {
 						selectedVpnRegion = fullTitle;
 					}
 
-					// Запуск ретро-окна подключения с логами
 					enableWebViewProxy(targetIp);
 				}
 			})
@@ -2726,7 +2586,7 @@ public class MainActivity extends Activity {
 		dialogLayout.setPadding(50, 40, 50, 40);
 
 		android.widget.ProgressBar progressBar = new android.widget.ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
-		progressBar.setIndeterminate(true); // Бегущая полоса загрузки
+		progressBar.setIndeterminate(true); 
 		dialogLayout.addView(progressBar);
 
 		final TextView logTextView = new TextView(this);
@@ -2807,8 +2667,7 @@ public class MainActivity extends Activity {
 												.addProxyRule(proxyUrl)
 												.build();
 
-											// 🔥 СВЕРХСПОСОБНОСТЬ: Вызываем метод динамически через Java-отражение!
-											// Это полностью убирает проверку типов Executor и Runnable на этапе компиляции в AIDE.
+											
 											java.lang.reflect.Method setProxyMethod = androidx.webkit.ProxyController.getInstance().getClass().getMethod(
 												"setProxyOverride", 
 												androidx.webkit.ProxyConfig.class, 
@@ -2816,12 +2675,12 @@ public class MainActivity extends Activity {
 												Runnable.class
 											);
 
-											// Системный исполнитель главного потока
+											
 											java.util.concurrent.Executor threadExecutor = new java.util.concurrent.Executor() {
 												@Override public void execute(Runnable r) { r.run(); }
 											};
 
-											// Системный колбэк успешного запуска
+											
 											Runnable successCallback = new Runnable() {
 												@Override public void run() {
 													isVpnActive = true; 
@@ -2859,7 +2718,7 @@ public class MainActivity extends Activity {
 	}
 	
 
-	// Добавьте этот метод отдельно в MainActivity.java:
+	
 	private void updateVpnLog(TextView textView, String message) {
 		if (vpnLogBuilder != null && textView != null) {
 			vpnLogBuilder.append(message).append("\n");
@@ -2888,24 +2747,21 @@ public class MainActivity extends Activity {
 			.setNegativeButton(t("Закрыть", "Close"), null).show();
 	}
 
-// Переопределение метода fixUrl с учетом выбранного поисковика
-	// ЕДИНСТВЕННЫЙ И УНИВЕРСАЛЬНЫЙ МЕТОД ФИКСАЦИИ ССЫЛОК
+
 	private String fixUrl(String input) {
 		if (input == null) return "about:blank";
 		String trimmed = input.trim();
 
-		// 1. Проверяем, является ли ввод готовой веб-ссылкой или файлом
 		if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || 
 			trimmed.startsWith("file://") || trimmed.startsWith("about:")) {
 			return trimmed;
 		}
 
-		// 2. Если в тексте есть точка и нет пробелов (например: 4pda.to), превращаем в ссылку
 		if (trimmed.contains(".") && !trimmed.contains(" ")) {
 			return "https://" + trimmed;
 		}
 
-		// 3. Если это просто текст — отправляем в выбранную в настройках поисковую систему
+	
 		try {
 			String query = java.net.URLEncoder.encode(trimmed, "UTF-8");
 			if (selectedSearchEngine == 1) {
@@ -2923,15 +2779,12 @@ public class MainActivity extends Activity {
 	}
 	
 	private void setupAdvancedDownloadListener() {
-		// Этот код применяется ко всем вкладкам. Если у вас мульти-вкладки, 
-		// вызывайте w.setDownloadListener внутри метода createNewTab()
 	}
 
-// Метод принудительного скачивания любого файла (вызывать из WebView)
+
 	private void forceDownloadFile(String url, String userAgent, String contentDisposition, String mimeType) {
 		Toast.makeText(this, t("📥 Перехват ссылки. Запуск тотального скачивания...", "📥 Downloading via Vir Engine..."), Toast.LENGTH_SHORT).show();
 
-		// Получаем Cookie для сайта, чтобы обойти защиту авторизации (Cloudflare/капчи)
 		final String cookies = android.webkit.CookieManager.getInstance().getCookie(url);
 		final String targetUrl = url;
 		final String ua = userAgent;
@@ -2948,7 +2801,7 @@ public class MainActivity extends Activity {
 						}
 						conn.connect();
 
-						// Извлекаем имя файла из заголовков или ссылки
+						
 						String fileName = "vir_download_" + System.currentTimeMillis();
 						String rawName = conn.getHeaderField("Content-Disposition");
 						if (rawName != null && rawName.contains("filename=")) {
@@ -2960,7 +2813,7 @@ public class MainActivity extends Activity {
 							}
 						}
 
-						// Скачиваем в стандартную папку Загрузок телефона
+					
 						File downloadDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS);
 						final File outputFile = new File(downloadDir, fileName);
 
@@ -2986,13 +2839,13 @@ public class MainActivity extends Activity {
 					} catch (Exception e) {
 						e.printStackTrace();
 
-						// ИСПРАВЛЕНО: Создаем final переменную для текста ошибки
+						
 						final String errorMessage = e.getMessage() != null ? e.getMessage() : "Unknown Error";
 
 						runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									// Используем безопасную final переменную errorMessage
+					
 									Toast.makeText(MainActivity.this, "Download Blocked/Error: " + errorMessage, Toast.LENGTH_SHORT).show();
 								}
 							});
@@ -3006,7 +2859,7 @@ public class MainActivity extends Activity {
 		File downloadDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS);
 		File[] files = downloadDir.listFiles();
 
-		// ИСПРАВЛЕНО: Добавлен флаг final, чтобы внутренние кнопки видели этот список
+		
 		final ArrayList<File> musicFiles = new ArrayList<File>();
 		if (files != null) {
 			for (File f : files) {
@@ -3031,7 +2884,7 @@ public class MainActivity extends Activity {
 			.setItems(trackNames, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					// ИСПРАВЛЕНО: Вместо квадратных скобок [] теперь используется правильный метод .get(which)
+					
 					final File selectedMusic = musicFiles.get(which);
 
 					new AlertDialog.Builder(MainActivity.this)
@@ -3063,10 +2916,9 @@ public class MainActivity extends Activity {
 			})
 			.setNegativeButton(t("Закрыть", "Close"), null).show();
 	}
-	// 1. ИНСПЕКТОР ЭЛЕМЕНТОВ (Редактор сайтов прямо на экране)
 	private void toggleElementInspector() {
 		if (currentWeb != null) {
-			// Запускаем инъекцию JavaScript кода в ядро страницы
+		
 			currentWeb.loadUrl("javascript:(function(){" +
 							   "if(document.designMode === 'on') {" +
 							   "document.designMode = 'off';" +
@@ -3079,7 +2931,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-// 2. ТУМБЛЕР РЕЖИМА "ТОЛЬКО ТЕКСТ" (Сейвер трафика)
+
 	private void toggleTextOnlyMode() {
 		isTextOnlyMode = !isTextOnlyMode;
 		prefs.edit().putBoolean("wv_text_only", isTextOnlyMode).apply();
@@ -3091,7 +2943,7 @@ public class MainActivity extends Activity {
 		Toast.makeText(this, isTextOnlyMode ? "🚫 Режим 'Только текст' включен" : "🔄 Отображение картинок включено", Toast.LENGTH_SHORT).show();
 	}
 
-// 3. ТУМБЛЕР АНТИ-ШПИОНА (Защита от скриншотов и записи экрана)
+
 	private void toggleAntiSpyMode() {
 		isAntiSpyEnabled = !isAntiSpyEnabled;
 		prefs.edit().putBoolean("wv_antispy", isAntiSpyEnabled).apply();
