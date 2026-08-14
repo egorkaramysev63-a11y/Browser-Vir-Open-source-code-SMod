@@ -1,0 +1,29 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 36
+
+    defaultConfig {
+        applicationId "com.vir.brower"
+        minSdkVersion 26
+        targetSdkVersion 36
+        versionCode 1431073
+        versionName "1.4.3-power-x-custom"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    // Стандартное подключение библиотек из папки libs
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+	
+    
+    // 🔥 НОВОЕ: Обязательная библиотека для работы Vir VPN Engine (ProxyController)
+    implementation 'androidx.webkit:webkit:1.6.0'
+}
+
