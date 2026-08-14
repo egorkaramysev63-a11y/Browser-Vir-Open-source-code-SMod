@@ -204,8 +204,6 @@ public class ChatActivity extends Activity {
             obj.put("text", text); 
             obj.put("time", time); 
             obj.put("is_my", isMy);
-
-            // Твой кусок кода: добавление в массив и сохранение в базу данных
             array.put(obj); 
             prefs.edit().putString(dbKey, array.toString()).apply();
 
@@ -237,5 +235,5 @@ public class ChatActivity extends Activity {
 				} 
 			});
     }
-} // 🔥 КОНЕЦ ВСЕГО КЛАССА CHATACTIVITY
+}
 
