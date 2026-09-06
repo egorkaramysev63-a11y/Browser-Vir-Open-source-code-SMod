@@ -4,236 +4,299 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.telephony.SmsManager;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-import org.json.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class ChatActivity extends Activity {
 
-    private SharedPreferences prefs;
-    private LinearLayout chatMessagesLayout;
-    private EditText messageInputField;
-    private ScrollView chatScrollView;
-
-    private String currentAccountName = "Main";
-    private String selectedTargetChat = ""; 
-    private int currentSendMethod = 0; // 0: ИИ, 1: BT, 2: SMS
+    private LinearLayout mainLayout, chatContainer, bottomPanel, dialogsListContainer;
+    private ScrollView chatScrollView, dialogsScrollView;
+    private EditText etMessageInput;
+    private TextView tvChatHeader;
+    private Button btnPlus, btnSendMessage, btnBackToDialogs;
+    private String currentChatType = "Общий", activeTarget = "Браузер";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences sysPrefs = getSharedPreferences("com.vir.brower_preferences", Context.MODE_PRIVATE);
-        currentAccountName = sysPrefs.getString("sys_current_account", "Main");
-        prefs = getSharedPreferences("com.vir.brower_preferences_" + currentAccountName, Context.MODE_PRIVATE);
-        showChatSelectionMenu();
-    }
 
-    private void showChatSelectionMenu() {
-        final String[] chats = new String[] {
-            "🤖 Бот-Тест (ИИ Ассистент)",
-            "📡 Bluetooth-чат (Рядом)",
-            "📟 SMS / MMS Менеджер"
-        };
-        new AlertDialog.Builder(this)
-            .setTitle("💬 Vir Сообщения: Выбор чата")
-            .setItems(chats, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) { selectedTargetChat = "Бот-Тест"; currentSendMethod = 0; }
-                    else if (which == 1) { selectedTargetChat = "Bluetooth-Узел"; currentSendMethod = 1; }
-                    else if (which == 2) { selectedTargetChat = "SMS/MMS Контакт"; currentSendMethod = 2; }
-                    buildGoogleMessageInterface();
-                }
-            }).setCancelable(false).show();
-    }
+        mainLayout = new LinearLayout(this);
+        mainLayout.setOrientation(LinearLayout.VERTICAL);
+        mainLayout.setBackgroundColor(0xFF121212); // Черный интерфейс
 
-    private void buildGoogleMessageInterface() {
-        LinearLayout mainRoot = new LinearLayout(this);
-        mainRoot.setOrientation(LinearLayout.VERTICAL);
-        mainRoot.setBackgroundColor(0xFFE5DDD5);
+        // ЭКРАН 1: ГЛАВНОЕ МЕНЮ ВСЕХ ДИАЛОГОВ (СУБД)
+        dialogsScrollView = new ScrollView(this);
+        dialogsListContainer = new LinearLayout(this);
+        dialogsListContainer.setOrientation(LinearLayout.VERTICAL);
+        dialogsListContainer.setPadding(30, 30, 30, 30);
+        dialogsScrollView.addView(dialogsListContainer);
+        mainLayout.addView(dialogsScrollView);
 
-        LinearLayout header = new LinearLayout(this);
-        header.setBackgroundColor(0xFF3F51B5); 
-        header.setPadding(40, 35, 40, 35);
+        btnPlus = new Button(this);
+        btnPlus.setText("+ Создать новый чат");
+        btnPlus.setBackgroundColor(0xFF34A853);
+        btnPlus.setTextColor(Color.WHITE);
 
-        TextView backBtn = new TextView(this);
-        backBtn.setText("◀  "); backBtn.setTextColor(0xFFFFFFFF); backBtn.setTextSize(18);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) { showChatSelectionMenu(); }
-			});
-        header.addView(backBtn);
+        // ЭКРАН 2: КОНТЕЙНЕР ПЕРЕПИСКИ
+        btnBackToDialogs = new Button(this);
+        btnBackToDialogs.setText("◀ Назад к диалогам");
+        btnBackToDialogs.setVisibility(View.GONE);
+        mainLayout.addView(btnBackToDialogs);
 
-        TextView headerTitle = new TextView(this);
-        headerTitle.setText(selectedTargetChat); headerTitle.setTextColor(0xFFFFFFFF); headerTitle.setTextSize(18);
-        header.addView(headerTitle); mainRoot.addView(header);
+        tvChatHeader = new TextView(this);
+        tvChatHeader.setPadding(30, 20, 30, 20);
+        tvChatHeader.setTextColor(Color.WHITE);
+        tvChatHeader.setVisibility(View.GONE);
+        mainLayout.addView(tvChatHeader);
 
         chatScrollView = new ScrollView(this);
-        LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1.0f);
-        chatScrollView.setLayoutParams(scrollParams);
-        chatMessagesLayout = new LinearLayout(this);
-        chatMessagesLayout.setOrientation(LinearLayout.VERTICAL);
-        chatMessagesLayout.setPadding(25, 20, 25, 20);
-        chatScrollView.addView(chatMessagesLayout); mainRoot.addView(chatScrollView);
+        chatScrollView.setLayoutParams(new LinearLayout.LayoutParams(-1, 0, 1.0f));
+        chatScrollView.setVisibility(View.GONE);
 
-        LinearLayout inputPanel = new LinearLayout(this);
-        inputPanel.setBackgroundColor(0xFFFFFFFF); inputPanel.setPadding(20, 15, 20, 15);
+        chatContainer = new LinearLayout(this);
+        chatContainer.setOrientation(LinearLayout.VERTICAL);
+        chatContainer.setPadding(20, 20, 20, 20);
+        chatScrollView.addView(chatContainer);
+        mainLayout.addView(chatScrollView);
 
-        final Button methodBtn = new Button(this);
-        final String[] types = {"ИИ", "BT", "SMS"};
-        methodBtn.setText(types[currentSendMethod]); methodBtn.setBackgroundColor(0xFF757575); methodBtn.setTextColor(0xFFFFFFFF);
-        methodBtn.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) {
-					currentSendMethod = (currentSendMethod + 1) % 3;
-					methodBtn.setText(types[currentSendMethod]);
-				}
-			});
-        inputPanel.addView(methodBtn);
+        // ПАНЕЛЬ ВВОДА И ВОССТАНОВЛЕНИЕ ЧЕРНОВИКА
+        bottomPanel = new LinearLayout(this);
+        bottomPanel.setPadding(20, 10, 20, 10);
+        bottomPanel.setVisibility(View.GONE);
 
-        messageInputField = new EditText(this); messageInputField.setHint("Текст...");
-        messageInputField.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
-        inputPanel.addView(messageInputField);
+        etMessageInput = new EditText(this);
+        etMessageInput.setHint("Напишите сообщение...");
+        etMessageInput.setHintTextColor(0xFF888888);
+        etMessageInput.setTextColor(Color.WHITE);
+        etMessageInput.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1.0f));
+        bottomPanel.addView(etMessageInput);
 
-        Button sendBtn = new Button(this);
-        sendBtn.setText("➡"); sendBtn.setBackgroundColor(0xFF3F51B5); sendBtn.setTextColor(0xFFFFFFFF);
-        sendBtn.setOnClickListener(new View.OnClickListener() {
-				@Override public void onClick(View v) { handleMessageSending(); }
-			});
-        inputPanel.addView(sendBtn); mainRoot.addView(inputPanel);
-        setContentView(mainRoot); loadChatHistory();
-    }
+        etMessageInput.setText(getSharedPreferences("VirIdPrefs", Context.MODE_PRIVATE).getString("draft_msg", ""));
 
-    private void handleMessageSending() {
-        final String text = messageInputField.getText().toString().trim();
-        if (text.isEmpty()) return;
-        final String timestamp = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+        btnSendMessage = new Button(this);
+        btnSendMessage.setText("▶");
+        bottomPanel.addView(btnSendMessage);
+        mainLayout.addView(bottomPanel);
 
-        appendMessageView(text, timestamp, true);
-        saveMessageToDatabase(text, timestamp, true);
-        messageInputField.setText("");
+        refreshDialogsList();
+        setContentView(mainLayout);
 
-        if (currentSendMethod == 0) {
-            new Thread(new Runnable() {
-					@Override public void run() {
-						try {
-							Thread.sleep(1200);
-							runOnUiThread(new Runnable() {
-									@Override public void run() {
-										String ans = "🤖 [AI]: '" + text + "'. Движок языка Paket в разработке для 1.4.4!";
-										appendMessageView(ans, timestamp, false); saveMessageToDatabase(ans, timestamp, false);
-										updateVpnLogScroll();
-									}
-								});
-						} catch (Exception e) {}
-					}
-				}).start();
-        } else if (currentSendMethod == 1) {
-            String btLog = "📡 [BT-Узел]: Пакет данных успешно доставлен.";
-            appendMessageView(btLog, timestamp, false); saveMessageToDatabase(btLog, timestamp, false);
-        } else if (currentSendMethod == 2) {
-            showSmsContactPickerAndSend(text);
-        }
-        updateVpnLogScroll();
-    }
+        // ОБРАБОТЧИКИ НАЖАТИЙ КНОПОК
+        btnPlus.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { showPlusMenuDialog(); }
+            });
 
-	
+        btnBackToDialogs.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    chatScrollView.setVisibility(View.GONE);
+                    bottomPanel.setVisibility(View.GONE);
+                    tvChatHeader.setVisibility(View.GONE);
+                    btnBackToDialogs.setVisibility(View.GONE);
+                    dialogsScrollView.setVisibility(View.VISIBLE);
+                    refreshDialogsList();
+                }
+            });
 
-    private void showSmsContactPickerAndSend(final String textMessage) {
-        final EditText numInput = new EditText(this); numInput.setHint("+79991234567"); numInput.setInputType(android.text.InputType.TYPE_CLASS_PHONE);
-        LinearLayout l = new LinearLayout(this); l.setPadding(50, 30, 50, 30); l.addView(numInput);
-        new AlertDialog.Builder(this).setTitle("📟 SMS / MMS").setView(l)
-            .setPositiveButton("Отправить", new DialogInterface.OnClickListener() {
-                @Override public void onClick(DialogInterface dialog, int which) {
-                    String phone = numInput.getText().toString().trim();
-                    if (!phone.isEmpty()) {
+        btnSendMessage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final String text = etMessageInput.getText().toString().trim();
+                    if (text.isEmpty()) return;
+
+                    appendMessageBubble("Вы", text, true, 0xFF1A73E8); // Синий прямоугольник
+                    etMessageInput.setText("");
+                    getSharedPreferences("VirIdPrefs", Context.MODE_PRIVATE).edit().remove("draft_msg").apply();
+                    saveChatToMemory("Вы: " + text);
+
+                    // ЛОГИКА ТАЙМЕРА БОТА БЕТА: beta="Ответ"/секунды
+                    if (text.toLowerCase().startsWith("beta=\"") && text.contains("\"/")) {
                         try {
-                            SmsManager.getDefault().sendTextMessage(phone, null, textMessage, null, null);
-                            Toast.makeText(ChatActivity.this, "SMS отправлено!", Toast.LENGTH_SHORT).show();
+                            int startQuote = text.indexOf("\"") + 1;
+                            int endQuote = text.indexOf("\"", startQuote);
+                            final String botReply = text.substring(startQuote, endQuote);
+                            int seconds = Integer.parseInt(text.substring(text.indexOf("/", endQuote) + 1).trim());
+
+                            new android.os.Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        appendMessageBubble("Бот Beta", botReply, false, 0xFF303030); // Серый прямоугольник
+                                        saveChatToMemory("Бот Beta: " + botReply);
+                                    }
+                                }, seconds * 1000);
+                            appendMessageBubble("Система", "Бот ответит через " + seconds + " сек.", false, 0xFF555555);
                         } catch (Exception e) {
-                            Intent mmsIntent = new Intent(Intent.ACTION_SENDTO);
-                            mmsIntent.setData(Uri.parse("smsto:" + phone));
-                            mmsIntent.putExtra("sms_body", textMessage); startActivity(mmsIntent);
+                            appendMessageBubble("Система", "Ошибка синтаксиса! Пример: beta=\"Привет\"/5", false, Color.RED);
                         }
                     }
                 }
-            }).setNegativeButton("Отмена", null).show();
+            });
     }
 
-    private void appendMessageView(String text, String time, boolean isMyMessage) {
-        LinearLayout messageBubble = new LinearLayout(this); messageBubble.setOrientation(LinearLayout.VERTICAL);
-        LinearLayout.LayoutParams bubbleParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        bubbleParams.topMargin = 12; bubbleParams.bottomMargin = 12;
-
-        TextView msgText = new TextView(this); msgText.setText(text); msgText.setTextSize(15); msgText.setTextColor(0xFF000000);
-        messageBubble.addView(msgText);
-        TextView timeText = new TextView(this); timeText.setText(time); timeText.setTextSize(10); timeText.setTextColor(0xFF757575);
-        LinearLayout.LayoutParams timeParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        timeParams.gravity = Gravity.RIGHT; timeText.setLayoutParams(timeParams); messageBubble.addView(timeText);
-
-        if (isMyMessage) {
-            messageBubble.setBackgroundColor(0xFFE1F5FE); bubbleParams.gravity = Gravity.RIGHT; messageBubble.setPadding(30, 15, 20, 15);
-        } else {
-            messageBubble.setBackgroundColor(0xFFFFFFFF); bubbleParams.gravity = Gravity.LEFT; messageBubble.setPadding(20, 15, 30, 15);
-        }
-        messageBubble.setLayoutParams(bubbleParams); chatMessagesLayout.addView(messageBubble);
+    @Override
+    protected void onPause() {
+        super.onPause(); // Сохранение черновика при закрытии экрана чата
+        String input = etMessageInput.getText().toString().trim();
+        if (!input.isEmpty()) getSharedPreferences("VirIdPrefs", Context.MODE_PRIVATE).edit().putString("draft_msg", input).apply();
     }
 
-	private void saveMessageToDatabase(String text, String time, boolean isMy) {
-        try {
-            String dbKey = "chat_history_json_" + selectedTargetChat;
-            JSONArray array = new JSONArray(prefs.getString(dbKey, "[]"));
+    // ОТРИСОВКА ПРЯМОУГОЛЬНЫХ ОБЛАКОВ СООБЩЕНИЙ СО СКРУГЛЕНИЕМ
+    private void appendMessageBubble(String sender, String text, boolean isMe, int bubbleColor) {
+        LinearLayout rowLayout = new LinearLayout(this);
+        rowLayout.setGravity(isMe ? Gravity.RIGHT : Gravity.LEFT);
+        LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(-1, -2);
+        rowParams.setMargins(0, 8, 0, 8);
+        rowLayout.setLayoutParams(rowParams);
 
-            JSONObject obj = new JSONObject(); 
-            obj.put("text", text); 
-            obj.put("time", time); 
-            obj.put("is_my", isMy);
-            array.put(obj); 
-            prefs.edit().putString(dbKey, array.toString()).apply();
+        GradientDrawable bubble = new GradientDrawable();
+        bubble.setShape(GradientDrawable.RECTANGLE);
+        bubble.setCornerRadius(20); 
+        bubble.setColor(bubbleColor);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        TextView tvBubbleText = new TextView(this);
+        tvBubbleText.setText(text);
+        tvBubbleText.setTextColor(Color.WHITE);
+        tvBubbleText.setPadding(30, 20, 30, 20);
+        tvBubbleText.setBackgroundDrawable(bubble);
+
+        LinearLayout.LayoutParams bubbleParams = new LinearLayout.LayoutParams(-2, -2);
+        tvBubbleText.setLayoutParams(bubbleParams);
+
+        rowLayout.addView(tvBubbleText);
+        chatContainer.addView(rowLayout);
+        chatScrollView.post(new Runnable() {
+                @Override public void run() { chatScrollView.fullScroll(View.FOCUS_DOWN); }
+            });
     }
-    private void loadChatHistory() {
-        try {
-            String dbKey = "chat_history_json_" + selectedTargetChat;
-            JSONArray array = new JSONArray(prefs.getString(dbKey, "[]"));
-            chatMessagesLayout.removeAllViews();
 
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject obj = array.getJSONObject(i);
-                appendMessageView(obj.getString("text"), obj.getString("time"), obj.getBoolean("is_my"));
+    // ЛОКАЛЬНАЯ СУБД: ЗАГРУЗКА СПИСКА СОХРАНЕННЫХ ЧАТОВ ПРИ ВХОДЕ В МЕНЮ
+    private void refreshDialogsList() {
+        dialogsListContainer.removeAllViews();
+        TextView tvMenuTitle = new TextView(this);
+        tvMenuTitle.setText("Ваши сохраненные переписки (СУБД):\n");
+        tvMenuTitle.setTextColor(Color.WHITE);
+        dialogsListContainer.addView(tvMenuTitle);
+
+        File chatDir = new File("/data/data/com.vir.brower/account/chats/");
+        if (chatDir.exists() && chatDir.listFiles() != null) {
+            for (final File chatFile : chatDir.listFiles()) {
+                if (chatFile.isFile() && chatFile.getName().startsWith("chat_")) {
+                    final String targetName = chatFile.getName().substring(5, chatFile.getName().length() - 4);
+                    Button btnDialogItem = new Button(this);
+                    btnDialogItem.setText("💬 Переписка с: " + targetName);
+                    btnDialogItem.setBackgroundColor(0xFF222222);
+                    btnDialogItem.setTextColor(Color.WHITE);
+
+                    LinearLayout.LayoutParams itemParams = new LinearLayout.LayoutParams(-1, -2);
+                    itemParams.setMargins(0, 8, 0, 8);
+                    btnDialogItem.setLayoutParams(itemParams);
+
+                    btnDialogItem.setOnClickListener(new View.OnClickListener() {
+                            @Override public void onClick(View v) { openExistingChatSession(targetName, chatFile); }
+                        });
+                    dialogsListContainer.addView(btnDialogItem);
+                }
             }
-            updateVpnLogScroll();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        dialogsListContainer.addView(btnPlus); 
+    }
+
+    private void openExistingChatSession(String target, File file) {
+        activeTarget = target; currentChatType = "Загруженный";
+        dialogsScrollView.setVisibility(View.GONE);
+        chatScrollView.setVisibility(View.VISIBLE);
+        bottomPanel.setVisibility(View.VISIBLE);
+        tvChatHeader.setVisibility(View.VISIBLE);
+        btnBackToDialogs.setVisibility(View.VISIBLE);
+        tvChatHeader.setText(" Чат: " + currentChatType + " (" + activeTarget + ")");
+        chatContainer.removeAllViews();
+
+        try {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("Вы: ")) {
+                        appendMessageBubble("Вы", line.substring(4), true, 0xFF1A73E8);
+                    } else if (line.contains(": ")) {
+                        int sep = line.indexOf(": ");
+                        appendMessageBubble(line.substring(0, sep), line.substring(sep + 2), false, 0xFF303030);
+                    }
+                }
+            }
+        } catch (IOException e) {} catch (Exception e) { 
+            e.printStackTrace(); 
         }
     }
 
-    private void updateVpnLogScroll() {
-        chatScrollView.post(new Runnable() { 
-				@Override 
-				public void run() { 
-					chatScrollView.fullScroll(View.FOCUS_DOWN); 
-				} 
-			});
+    private void showPlusMenuDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Создать новый чат");
+        String[] options = {"Робот ИИ Gemini 1.5 [Beta]", "Связь по BT / SMS"};
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (which == 0) {
+                        startNewChatSession("Gemini 1.5", "Нейросеть");
+                    } else if (which == 1) {
+                        showIdOrNumberInputDialog();
+                    }
+                }
+            });
+        builder.show();
+    }
+
+    private void showIdOrNumberInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Данные адресата");
+        final EditText inputField = new EditText(this);
+        inputField.setHint("Введите ID телефона или Номер");
+        builder.setView(inputField);
+        builder.setPositiveButton("Готово", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String target = inputField.getText().toString().trim();
+                    if (!target.isEmpty()) {
+                        startNewChatSession("Шлюз", target);
+                    }
+                }
+            });
+        builder.show();
+    }
+
+    private void startNewChatSession(String type, String target) {
+        currentChatType = type; activeTarget = target;
+        dialogsScrollView.setVisibility(View.GONE);
+        chatScrollView.setVisibility(View.VISIBLE);
+        bottomPanel.setVisibility(View.VISIBLE);
+        tvChatHeader.setVisibility(View.VISIBLE);
+        btnBackToDialogs.setVisibility(View.VISIBLE);
+        tvChatHeader.setText(" Чат: " + currentChatType + " (" + activeTarget + ")");
+        chatContainer.removeAllViews();
+        appendMessageBubble("Система", "Тоннель шлюза связи успешно запущен.", false, 0xFF7F8C8D);
+        new File("/data/data/com.vir.brower/account/chats/").mkdirs();
+    }
+
+    private void saveChatToMemory(String text) {
+        try {
+            try (FileWriter writer = new FileWriter(new File("/data/data/com.vir.brower/account/chats/chat_" + activeTarget + ".txt"), true)) {
+                writer.write(text + "\n");
+            }
+        } catch (IOException e) {} catch (Exception e) { 
+            e.printStackTrace(); 
+        }
     }
 }
 
