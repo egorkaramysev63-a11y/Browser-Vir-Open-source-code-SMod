@@ -1,32 +1,56 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    // СТРОКУ С VKID.MANIFEST.PLACEHOLDERS ПОЛНОСТЬЮ УДАЛЯЕМ ОТСЮДА!
+}
 
 android {
-    compileSdkVersion 30
+    namespace "com.vir.brower"
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.vir.brower"
-        minSdkVersion 21
-        targetSdkVersion 26
-        versionCode 54546145
-        versionName "1.4.5-power-x-marmalade"
+        minSdkVersion 26
+        targetSdkVersion 34
+        versionCode 1484738146
+        versionName "1.4.6-beta-marshmallow-power-x-new"
+
+        // Оставляем пустую строку, так как мы всё пропишем внутри AndroidManifest
+        manifestPlaceholders = [:]
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
-    // Оставляем только то, что на 100% стабильно и никогда не создает пустых XML-файлов
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    // Базовые библиотеки AndroidX
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.webkit:webkit:1.6.0'
-}
 
+    // Сериализация и СУБД данных
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    // Библиотеки VK ID (Берутся напрямую из Nexus)
+    //implementation 'com.vk.id:vkid:2.7.2'
+    //implementation 'com.vk.id:onetap-xml:2.7.2'
+
+    // Сеть
+    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+
+    // RuStore
+    implementation 'ru.rustore.sdk:pushclient:2.2.0'
+    implementation 'ru.rustore.sdk:billingclient:6.1.0'
+}
