@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<!-- ГРУППА 1: СЕТЬ И ИНТЕРНЕТ -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- ГРУППА 2: ХРАНИЛИЩЕ И ФАЙЛЫ -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Добавлено игнорирование для прохождения тестов RuStore / Google Play -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+
+    <!-- ГРУППА 4: БЕСПРОВОДНЫЕ МОДУЛИ, ГЕОЛОКАЦИЯ И NFC -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.NFC" />
+
+    <!-- ГРУППА 5: АППАРАТНЫЕ ПРАВА И СИСТЕМНЫЕ ОКНА -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+    <!-- Убираем предупреждение об устаревшем USE_FINGERPRINT -->
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" tools:ignore="Deprecated Wilkinson" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" tools:ignore="ProtectedPermissions" />
+
+    <!-- ГРУППА 6: АВТОЗАПУСК И СЛУЖБЫ -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Для Android 14+ добавлено игнорирование на SPECIAL_USE, если нет явного обоснования -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" tools:ignore="ForegroundServicePermission" />
+    <uses-permission android:name="ru.vk.store.permission.BILLING" />
+
+    <!-- КАСТОМНЫЕ ПРАВА VIR -->
+    <permission
+        android:name="com.vir.permission.USE_FR_FRAMEWORK_ROF"
+        android:protectionLevel="signatureOrSystem"
+        tools:ignore="ProtectionLevel" />
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+    <uses-feature android:name="android.hardware.nfc" android:required="false" />
+
+    <queries>
+        <package android:name="ru.vk.store" />
+        <package android:name="com.vir.services" />
+        <package android:name="com.vir.apps" />
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name_setup"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:resizeableActivity="true"
+        android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true"
+        tools:ignore="GoogleAppIndexingWarning">
+
+        <receiver android:name=".BookmarksWidgetProvider" android:exported="true" android:label="Vir Закладки">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/bookmarks_widget_info" />
+        </receiver>
+
+        <!-- ГРУППА КОМПОНЕНТОВ: СТАРТОВАЯ АКТИВНОСТЬ -->
+        <activity
+            android:name=".UpdateActivity"
+            android:label="@string/app_name"
+            android:exported="true">
+        </activity>
+
+        <!-- ГРУППА КОМПОНЕНТОВ: КАСТОМНЫЕ ИКОНКИ ЗАПУСКА (ЮЗЕР-ВЫБОР) -->
+        <activity-alias
+            android:name=".UpdateActivityIcon"
+            android:enabled="true"
+            android:icon="@drawable/icon"
+            android:label="@string/app_name"
+            android:targetActivity=".UpdateActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".UpdateActivityIcon1"
+            android:enabled="false"
+            android:icon="@drawable/icon1"
+            android:label="@string/app_name"
+            android:targetActivity=".UpdateActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".UpdateActivityIcon2"
+            android:enabled="false"
+            android:icon="@drawable/icon2"
+            android:label="@string/app_name"
+            android:targetActivity=".UpdateActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".UpdateActivityIcon3"
+            android:enabled="false"
+            android:icon="@drawable/icon3"
+            android:label="@string/app_name"
+            android:targetActivity=".UpdateActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".UpdateActivityIcon4"
+            android:enabled="false"
+            android:icon="@drawable/icon4"
+            android:label="@string/app_name"
+            android:targetActivity=".UpdateActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".UpdateActivityIcon5"
+            android:enabled="false"
+            android:icon="@drawable/icon5"
+            android:label="@string/app_name"
+            android:targetActivity=".UpdateActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- ГРУППА КОМПОНЕНТОВ: БРАУЗЕРНОЕ ЯДРО -->
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name_setup"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:exported="true">
+            <intent-filter android:priority="100">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:mimeType="text/html" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="application/xhtml+xml" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.WEB_SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
+        <!-- ГРУППА КОМПОНЕНТОВ: ЭКРАНЫ СЕРВИСОВ VIR -->
+        <activity android:name=".LoginActivity" android:label="Vir ID" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".ChatActivity" android:label="Vir Чат" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".BuildActivity" android:label="Vir ID Update" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".HutActivity" android:label="Hut Защита" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".PlayActivity" android:label="Vir Play" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".DataActivity" android:label="Vir Календарь" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".MapActivity" android:label="Vir Карты" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".ServiceActivity" android:label="Vir Сервисы" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".SModActivity" android:label="SMod Manager" android:configChanges="orientation|screenSize" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".QrScannerActivity" android:label="Сканер" android:configChanges="orientation|screenSize" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".CalcActivity" android:label="Калькулятор" android:configChanges="orientation|screenSize" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".OfficeActivity" android:label="MS Office Редактор" android:configChanges="orientation|screenSize" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".TimeActivity" android:label="Часы и Время" android:configChanges="orientation|screenSize" />
+        <activity android:name=".FileManagerActivity" android:label="SMod Проводник" android:configChanges="orientation|screenSize" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".KernelActivity" android:label="Ядро" android:configChanges="orientation|screenSize" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".ChatAccountActivity" android:label="Профиль Собеседника" android:configChanges="orientation|screenSize|keyboardHidden" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <!-- ГРУППА КОМПОНЕНТОВ: HTML РЕДАКТОР И УРОКИ -->
+        <activity android:name=".HtmlActivity" android:exported="true" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".HtmlPreviewActivity" android:exported="false" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity android:name=".LessonActivity" android:exported="false" android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <!-- ГРУППА КОМПОНЕНТОВ: ИГРЫ (С подавлением предупреждений об ориентации экрана) -->
+        <activity android:name=".GameminiActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".GameActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".LabyrinthActivity" android:label="Лабиринт" android:screenOrientation="portrait" android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" android:configChanges="orientation|screenSize" tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".HorrorGameActivity" android:screenOrientation="portrait" android:theme="@style/Theme.AppCompat.Light.NoActionBar" android:configChanges="orientation|screenSize" tools:ignore="LockedOrientationActivity" />
+
+        <!-- ГРУППА КОМПОНЕНТОВ: СИСТЕМНЫЕ СЛУЖБЫ И РЕСИВЕРЫ -->
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".BackgroundBrowserService" android:foregroundServiceType="dataSync" android:exported="false" tools:ignore="ForegroundServicePermission" />
+        <service android:name=".VirUserScannerService" android:exported="false" />
+        <service android:name=".ChatService" android:foregroundServiceType="dataSync" android:exported="false" tools:ignore="ForegroundServicePermission" />
+
+        <!-- ГРУППА КОМПОНЕНТОВ: ВНЕШНИЙ ФРЕЙМВОРК И СУБД -->
+        <activity android:name=".VirFrAuthActivity" android:label="Авторизация Vir FR" android:theme="@android:style/Theme.Material.Dialog" android:exported="true">
+            <intent-filter>
+                <action android:name="com.vir.action.FR_FRAMEWORK_ROF_AUTH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <provider android:name=".VirCoreProvider" android:authorities="com.vir.browser.core_provider" android:exported="true" android:permission="com.vir.permission.USE_FR_FRAMEWORK_ROF" />
+
+    </application>
+</manifest>
