@@ -1378,21 +1378,27 @@ private void showAnimationDialog() {
 	}
 
 	private void startWizardSettings() {
-		// Если переменная уже 1, значит проверка выполнялась в текущей сессии — выходим
+		// 1. Проверяем флаг в памяти текущей сессии
 		if (wizardCheckStatus == 1) {
+			startBrowser(""); // Если уже проверяли (равно 1), просто запускаем браузер
 			return;
 		}
 
-		// Меняем переменную с 0 на 1 (теперь проверка считается пройденной)
+		// Меняем переменную с 0 на 1 (теперь первая проверка считается зафиксированной)
 		wizardCheckStatus = 1;
 
-		// Читаем настройки, используя нашу новую константу
+		// 2. Проверяем, завершен ли мастер настроек в постоянной памяти (SharedPreferences)
 		if (!prefs.getBoolean(KEY_WIZARD_COMPLETED, false)) {
+			// Если НЕ пройден — отправляем пользователя на настройку
 			Intent intent = new Intent(this, WizardActivity.class);
 			startActivity(intent);
-			finish();
+			finish(); // Здесь finish() нужен, чтобы закрыть стартовый экран, пока идет настройка
+		} else {
+			// Если мастер УЖЕ успешно пройден ранее — сразу открываем браузер
+			startBrowser("");
 		}
 	}
+
 
 
 	private void startBrowser(String url) {
