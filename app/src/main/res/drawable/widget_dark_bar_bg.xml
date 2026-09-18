@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Цвет панели поиска (темный полупрозрачный) -->
-    <solid android:color="#CC1F1F1F" />
-    <!-- Радиус 20dp при высоте 40dp сделает края полностью круглыми -->
-    <corners android:radius="20dp" />
-</shape>
-

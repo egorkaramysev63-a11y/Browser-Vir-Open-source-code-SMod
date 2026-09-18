@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Глубокий темный цвет фона (90% непрозрачности) -->
-    <solid android:color="#E61A1A1A" />
-    <!-- Скругление углов, как на современных версиях Android -->
-    <corners android:radius="16dp" />
-</shape>
