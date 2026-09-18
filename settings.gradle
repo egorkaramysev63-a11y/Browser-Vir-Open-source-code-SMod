@@ -1,2 +1,25 @@
-include ':app'
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    // Включаем режим, разрешающий гибкую настройку репозиториев на уровне проекта
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
 
+        // Официальные и единственные рабочие репозитории для VK ID SDK на сервере Nexus
+        maven { url "https://nexus-external.vkteam.ru/repository/vkid-sdk-android/" }
+        maven { url "https://nexus-external.vkteam.ru/repository/maven/" }
+
+        // Репозиторий RuStore Billing SDK
+        maven { url "https://vkteam.ru" }
+    }
+}
+
+rootProject.name = "Browser-Vir-Open-source-code-SMod"
+include ':app'
